@@ -17,7 +17,7 @@ class DiscoverFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //use option menu
+        // Enable option menu
         setHasOptionsMenu(true)
     }
 
@@ -28,32 +28,39 @@ class DiscoverFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_discover, container, false)
     }
-    fun successOpportunityListFromFireStore(opportunityList: ArrayList<Opportunity>){
+
+    // Function to set up RecyclerView to display list of opportunities
+    fun successOpportunityListFromFireStore(opportunityList: ArrayList<Opportunity>) {
         val rv_opportunity = requireView().findViewById<RecyclerView>(R.id.rv_opportunity)
         rv_opportunity.layoutManager = LinearLayoutManager(activity)
         rv_opportunity.setHasFixedSize(true)
         val adapterOpportunity = MyOpportunityListAdapter(requireActivity(), opportunityList)
         rv_opportunity.adapter = adapterOpportunity
     }
-    private fun getOpportunityListFromFireStore(){
+
+    // Function to get list of opportunities from Firestore database
+    private fun getOpportunityListFromFireStore() {
         FirestoreClass().getOpportunityList(this)
     }
 
     override fun onResume() {
         super.onResume()
+        // Call function to get opportunity list from Firestore when the fragment resumes
         getOpportunityListFromFireStore()
     }
 
-
+    // Function to create the option menu
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.add_opportunity_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    // Function to handle option menu item clicks
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        when(id){
+        when(id) {
+            // If the user clicks on "Add Opportunity" menu item, start the AddOpportunityActivity
             R.id.action_add_opportunity -> {
                 startActivity(Intent(activity, AddOpportunityActivity::class.java))
                 return true

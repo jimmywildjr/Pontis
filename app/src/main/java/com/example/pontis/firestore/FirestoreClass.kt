@@ -22,23 +22,25 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
 class FirestoreClass {
-
+    // create a new instance of Firebase Firestore
     private val mFireStore = FirebaseFirestore.getInstance()
-    //used in signupactivty to create user document in firestore
+
+    // function to register user in Firebase Firestore
     fun registerUser(activity: SignUpActivity, userInfo: User) {
-        // the "users" is the name of the collection. If the collection is already created (in database) then it will not create the same collection"
+        // the "users" is the name of the collection. If the collection is already created (in database) then it will not create the same collection
         mFireStore.collection(Constants.USERS)
-            // id for document is the user id
+            // set the document id to the user id
             .document(userInfo.id)
-            //merge the data if the user details already exist
+            // merge the data if the user details already exist
             .set(userInfo, SetOptions.merge())
             .addOnSuccessListener {
-
+                // handle success case here
             }
     }
 
+    // function to get the current user's ID
     fun getCurrentUserID(): String {
-        // an instance of currentUser using firebase auth
+        // get an instance of the current user using Firebase Auth
         val currentUser = FirebaseAuth.getInstance().currentUser
 
         // variable to assign the currentUserId if it is not null or else it will be blank
@@ -49,30 +51,34 @@ class FirestoreClass {
         return currentUserID
     }
 
+    // function to get user details from Firebase Firestore
     fun getUserDetails(activity: Activity) {
-        //pass collection name where we want to retrieve data
+        // pass collection name where we want to retrieve data
         mFireStore.collection(Constants.USERS)
             // document id to get the fields of user
             .document(getCurrentUserID())
             .get()
             .addOnSuccessListener { document ->
                 Log.i(activity.javaClass.simpleName, document.toString())
-                //convert document snapshot to user data model object
+                // convert document snapshot to user data model object
                 val user = document.toObject(User::class.java)
 
-                val sharedPreferences =
-                    activity.getSharedPreferences(
-                        Constants.PONTIS_PREFERENCES,
-                        //makes sure data is only accessible within the app
-                        Context.MODE_PRIVATE
-                    )
+                // create a new instance of shared preferences
+                val sharedPreferences = activity.getSharedPreferences(
+                    Constants.PONTIS_PREFERENCES,
+                    // makes sure data is only accessible within the app
+                    Context.MODE_PRIVATE
+                )
+                // create a new editor object
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                // set the logged-in username key-value pair
                 editor.putString(
-                    // key value pair
                     Constants.LOGGED_IN_USERNAME,
                     "${user?.firstName} ${user?.lastName}"
                 )
+                // apply the changes to the shared preferences
                 editor.apply()
+                // handle success case depending on the activity
                 when (activity) {
                     is SignInActivity -> {
                         if (user != null) {
@@ -83,30 +89,37 @@ class FirestoreClass {
 
             }
             .addOnFailureListener { e ->
+                // handle failure case here
                 Log.e(activity.javaClass.simpleName, "error whilst getting users details.", e)
             }
-
     }
 
+    // Update user profile data in Firestore
     fun updateUserProfileData(activity: Activity, userHashMap: HashMap<String, Any>) {
-        mFireStore.collection((Constants.USERS)).document(getCurrentUserID())
+        // Update document with the current user's ID
+        mFireStore.collection(Constants.USERS).document(getCurrentUserID())
             .update(userHashMap)
             .addOnSuccessListener {
+                // Success case for updating user profile
                 when (activity) {
                     is OnboardingActivity -> {
                         activity.userProfileUpdateSuccess()
                     }
                 }
-
             }
             .addOnFailureListener { e ->
+                // Failure case for updating user profile
                 Log.e(
-                    activity.javaClass.simpleName, "error while updating user details", e
+                    activity.javaClass.simpleName,
+                    "error while updating user details",
+                    e
                 )
             }
     }
 
+    // Upload image to Cloud Storage and return the download URL
     fun uploadImageToCloudStorage(activity: Activity, imageFileURI: Uri?, imageType: String) {
+        // Create a reference to the Firebase storage bucket location
         val sRef: StorageReference = FirebaseStorage.getInstance().reference.child(
             imageType + System.currentTimeMillis() + "." + Constants.getFileExtension(
                 activity,
@@ -114,13 +127,14 @@ class FirestoreClass {
             )
         )
         sRef.putFile(imageFileURI!!)
-            //image upload is successful
             .addOnSuccessListener { taskSnapshot ->
+                // Image upload is successful
                 Log.e(
                     "Firebase Image URL", taskSnapshot.metadata!!.reference!!.downloadUrl.toString()
                 )
                 taskSnapshot.metadata!!.reference!!.downloadUrl.addOnSuccessListener { uri ->
                     Log.e("Downloadable Image URL", uri.toString())
+                    // Success case for uploading image to Cloud Storage
                     when (activity) {
                         is OnboardingActivity -> {
                             activity.imageUploadSuccess(uri.toString())
@@ -132,6 +146,7 @@ class FirestoreClass {
                 }
             }
             .addOnFailureListener { exception ->
+                // Failure case for uploading image to Cloud Storage
                 Log.e(
                     activity.javaClass.simpleName,
                     exception.message,
@@ -140,7 +155,8 @@ class FirestoreClass {
             }
     }
 
-    fun uploadOpportunityDetails(activity: AddOpportunityActivity, opportunityInfo: Opportunity){
+    // Uploads opportunity details to Firestore database
+    fun uploadOpportunityDetails(activity: AddOpportunityActivity, opportunityInfo: Opportunity) {
         mFireStore.collection(Constants.OPPORTUNITY)
             .document()
             .set(opportunityInfo, SetOptions.merge())
@@ -155,62 +171,69 @@ class FirestoreClass {
                 )
             }
     }
-    //function to get opportunities
-    fun getOpportunityList(fragment: Fragment){
+
+    // Gets list of opportunities from Firestore database
+    fun getOpportunityList(fragment: Fragment) {
         mFireStore.collection(Constants.OPPORTUNITY)
             .get()
             .addOnSuccessListener { document ->
                 Log.e("Opportunity List", document.documents.toString())
                 val opportunityList: ArrayList<Opportunity> = ArrayList()
-                for (i in document.documents){
+                for (i in document.documents) {
                     val opportunity = i.toObject(Opportunity::class.java)
                     opportunity!!.opportunity_id = i.id
-
                     opportunityList.add(opportunity)
                 }
-                when(fragment){
-                    is DiscoverFragment ->{
+                when(fragment) {
+                    is DiscoverFragment -> {
                         fragment.successOpportunityListFromFireStore(opportunityList)
                     }
                 }
             }
     }
-    //gets opportunity details
-    fun getOpportunityDetails(activity: OpportunityDetailsActivity, opportunityId: String){
+
+    // Gets opportunity details from Firestore database
+    fun getOpportunityDetails(activity: OpportunityDetailsActivity, opportunityId: String) {
         mFireStore.collection(Constants.OPPORTUNITY)
             .document(opportunityId)
             .get()
-            .addOnSuccessListener {document ->
-                Log.e(activity.javaClass.simpleName,document.toString())
-                //create opportunity object
+            .addOnSuccessListener { document ->
+                Log.e(activity.javaClass.simpleName, document.toString())
+                // Create opportunity object
                 val opportunity = document.toObject(Opportunity::class.java)
                 if (opportunity != null) {
                     activity.opportunityDetailsSuccess(opportunity)
                 }
             }
-            .addOnFailureListener{e->
-                Log.e(activity.javaClass.simpleName, "error while getting opportunity details",e)
+            .addOnFailureListener { e->
+                Log.e(activity.javaClass.simpleName, "Error while getting opportunity details", e)
             }
-
     }
+
+    // This function adds a FollowItem to the Firestore collection.
     fun addFollowItems(activity: OpportunityDetailsActivity, addToFollow: FollowItem){
+        // Get the Firestore collection for follow items and add the FollowItem with merge options.
         mFireStore.collection(Constants.FOLLOW_ITEMS)
             .document()
-                //merges
             .set(addToFollow, SetOptions.merge())
             .addOnSuccessListener {
+                // If the addition was successful, call the "addToFollowListSuccess" function in the activity.
                 activity.addToFollowListSuccess()
             }
             .addOnFailureListener{e->
+                // If the addition was not successful, log an error.
                 Log.e(activity.javaClass.simpleName, "error creating follow item",e)
             }
     }
+
+    // This function retrieves the follow list for the current user.
     fun getFollowList(activity: Activity){
-        //gets followed opportities for the user who is signed in
+        // Get the Firestore collection for follow items where the user ID matches the current user's ID.
         mFireStore.collection(Constants.FOLLOW_ITEMS)
             .whereEqualTo(Constants.USER_ID, getCurrentUserID())
             .get()
             .addOnSuccessListener {document->
+                // If the retrieval was successful, log the documents and create a list of FollowItems.
                 Log.e(activity.javaClass.simpleName, document.documents.toString())
                 val list:ArrayList<FollowItem> = ArrayList()
                 for (i in document.documents){
@@ -218,6 +241,7 @@ class FirestoreClass {
                     followItem.id = i.id
                     list.add(followItem)
                 }
+                // Depending on the activity that called this function, call the appropriate success function with the list.
                 when (activity){
                     is FollowListActivity ->{
                         activity.successFollowItemList(list)
@@ -225,15 +249,19 @@ class FirestoreClass {
                 }
             }
             .addOnFailureListener {e->
+                // If the retrieval was not successful, log an error.
                 Log.e(activity.javaClass.simpleName, "Error while getting the cart list items", e)
             }
     }
-    //called in the adapter to remove the follow
+
+    // This function removes a follow from the Firestore collection.
     fun removeFollow(context: Context, item_id: String){
+        // Get the Firestore collection for follow items and delete the item with the given ID.
         mFireStore.collection(Constants.FOLLOW_ITEMS)
             .document(item_id)
             .delete()
             .addOnSuccessListener {
+                // If the deletion was successful, call the appropriate success function based on the context.
                 when(context){
                     is FollowListActivity ->{
                         context.followRemovedSuccess()
@@ -241,7 +269,7 @@ class FirestoreClass {
                 }
             }
             .addOnFailureListener {
-
+                // If the deletion was not successful, do nothing.
             }
     }
 }

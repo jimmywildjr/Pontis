@@ -20,30 +20,38 @@ class FollowListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_follow_list)
     }
-    fun successFollowItemList(followList: ArrayList<FollowItem>){
-        if (followList.size > 0){
+
+    // Function to handle success callback of FirestoreClass.getFollowList()
+    fun successFollowItemList(followList: ArrayList<FollowItem>) {
+        if (followList.size > 0) {
+            // Get the RecyclerView object from the activity_follow_list.xml file
             val rv_follow_items_list = findViewById<RecyclerView>(R.id.rv_follow_items_list)
+            // Set the layout manager for the RecyclerView
             rv_follow_items_list.layoutManager = LinearLayoutManager(this@FollowListActivity)
             rv_follow_items_list.setHasFixedSize(true)
 
+            // Create a new FollowItemAdapter with the followList data and set it as the adapter for the RecyclerView
             val followItemAdapter = FollowItemAdapter(this@FollowListActivity, followList)
             rv_follow_items_list.adapter = followItemAdapter
         }
     }
-    private fun getFollowItemList(){
+
+    // Function to get the list of items the user is following and display it in the RecyclerView
+    private fun getFollowItemList() {
         FirestoreClass().getFollowList(this@FollowListActivity)
     }
 
+    // Function to refresh the RecyclerView when the activity is resumed
     override fun onResume() {
         super.onResume()
         getFollowItemList()
     }
-    //called once the removeFollow function in firestore class is successful
-    fun followRemovedSuccess(){
+
+    // Function called when the removeFollow function in FirestoreClass is successful
+    fun followRemovedSuccess() {
+        // Display a toast indicating that the item has been unfollowed
         Toast.makeText(this@FollowListActivity, "Unfollowed", Toast.LENGTH_SHORT).show()
-        //reloads list with the unfollowed item removed
+        // Refresh the RecyclerView to remove the unfollowed item
         getFollowItemList()
     }
-
-
 }

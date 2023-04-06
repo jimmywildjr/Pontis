@@ -9,12 +9,12 @@ import android.widget.TextView
 import com.example.pontis.R
 import com.example.pontis.utils.Constants
 
-
+// Define a fragment to show on home screen
 class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //allows menu bar
+        // Enable options menu in this fragment
         setHasOptionsMenu(true)
     }
 
@@ -25,14 +25,18 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_home, container, false)
 
+        // Get the username from shared preferences
         val sharedPreferences = requireContext().getSharedPreferences(Constants.PONTIS_PREFERENCES, Context.MODE_PRIVATE)
         val username = sharedPreferences.getString(Constants.LOGGED_IN_USERNAME,"")!!
+
+        // Set the greeting text with the username
         val tvHome: TextView = view.findViewById(R.id.tv_home)
         tvHome.text = "Hello $username"
 
         return view
     }
-    //creates the menu bar
+
+    // Create options menu in the fragment
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -42,9 +46,8 @@ class HomeFragment : Fragment() {
         val id = item.itemId
 
         when (id) {
-
             R.id.action_favourite -> {
-
+                // Open FollowListActivity when the user clicks on the Favorite icon
                 startActivity(Intent(activity, FollowListActivity::class.java))
                 return true
             }

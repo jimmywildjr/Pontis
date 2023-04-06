@@ -16,8 +16,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 
-
 class SettingsFragment : Fragment() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -28,43 +28,41 @@ class SettingsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
-        //displays the users name
+
+        // Display user's name
         val sharedPreferences = requireContext().getSharedPreferences(Constants.PONTIS_PREFERENCES, Context.MODE_PRIVATE)
         val username = sharedPreferences.getString(Constants.LOGGED_IN_USERNAME,"")!!
         val tvSettings: TextView = view.findViewById(R.id.tv_settings)
         tvSettings.text = "Hello $username"
 
-        //onClickListener on logout button, logs user out and loads sign in activity
+        // Set onClickListener on Logout button, log user out and load SignInActivity
         val logout = view.findViewById<Button>(R.id.btn_logout)
-
         logout.setOnClickListener{
-            //retrieves details
+            // Retrieve details
             val context = requireContext().applicationContext
             val resId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(context.getString(resId))
                 .requestEmail()
                 .build()
-            //signs user out
+            // Sign user out
             val googlesigninclient = GoogleSignIn.getClient(requireActivity(), gso)
             googlesigninclient.signOut()
             FirebaseAuth.getInstance().signOut()
-            //loads sign in activity
+            // Load SignInActivity
             val intent = Intent(requireActivity(), SignInActivity::class.java)
             startActivity(intent)
         }
 
-        //onClickListener for change details - loads the changedetailsactivity
+        // Set onClickListener for Change Details button, load ChangeDetailsActivity
         val changedetails = view.findViewById<Button>(R.id.changedetails)
-
         changedetails.setOnClickListener{
             val intent = Intent(requireActivity(), ChangeDetailsActivity::class.java)
             startActivity(intent)
         }
 
-        //onClickListener for delete account - deletes user account and loads Signinactivity
+        // Set onClickListener for Delete Account button, delete user account and load SignInActivity
         val deleteaccount = view.findViewById<Button>(R.id.deleteaccount)
-
         deleteaccount.setOnClickListener{
             val currentUser = FirebaseAuth.getInstance().currentUser
             currentUser?.delete()

@@ -9,29 +9,37 @@ import com.google.firebase.auth.FirebaseAuth
 
 class ResetPasswordActivity : AppCompatActivity() {
 
+    // declare view binding and firebase authentication variables
     private lateinit var binding: ActivityResetPasswordBinding
     private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //initialise binding and firebase
+        //inflate the view using the view binding and set the content view
         binding = ActivityResetPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // initialize firebase authentication instance
         firebaseAuth = FirebaseAuth.getInstance()
 
-        //checks if the textView saying go back has been clicked
+        // set a click listener on the "go back" TextView to go back to sign-in screen
         binding.goback.setOnClickListener{
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
         }
-        //check if send reset password email button been clicked
+
+        // set a click listener on the "send reset password email" button to send reset email
         binding.resetemail.setOnClickListener {
+            // get email entered by user
             val email = binding.emailEt.text.toString()
+
+            // check if email is not empty
             if (email.isNotEmpty()) {
+                // send password reset email using firebase authentication
                 firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener {
-                    //check if it has been successful
+                    // check if password reset email has been sent successfully
                     if (it.isSuccessful) {
+                        // go back to sign-in screen and display success message
                         val intent = Intent(this, SignInActivity::class.java)
                         startActivity(intent)
                         Toast.makeText(
@@ -40,10 +48,12 @@ class ResetPasswordActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
+                        // display error message if there was an error while sending reset email
                         Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
+                // display error message if email field is empty
                 Toast.makeText(this, "Email is empty", Toast.LENGTH_SHORT).show()
             }
         }
