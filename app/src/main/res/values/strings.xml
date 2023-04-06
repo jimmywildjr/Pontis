@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Pontis</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="school_year">
+        <item>Select Your School Year</item>
+        <item>Year 13</item>
+        <item>Year 12</item>
+        <item>Year 11</item>
+        <item>Year 10</item>
+        <item>Year 9</item>
+        <item>Year 8</item>
+        <item>Year 7</item>
+    </string-array>
+    <string-array name="home_city">
+        <item>Select Your Home City</item>
+        <item>North West</item>
+        <item>Cymru Wales</item>
+        <item>East Midlands</item>
+        <item>East of England</item>
+        <item>London</item>
+        <item>North East and Cumbria</item>
+        <item>Northern Ireland</item>
+        <item>Scotland</item>
+        <item>South East</item>
+        <item>South West</item>
+        <item>West Midlands</item>
+        <item>Yorkshire and the Humber</item>
+    </string-array>
+    <string-array name="industry">
+        <item>Select Your Industry</item>
+        <item>Healthcare</item>
+        <item>Technology</item>
+        <item>Media</item>
+        <item>Construction</item>
+    </string-array>
+    <string-array name="type">
+        <item>Select Your Type</item>
+        <item>Work Experience</item>
+        <item>Internship</item>
+        <item>Competition</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

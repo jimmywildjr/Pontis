@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "914437503685",
+    "project_id": "pontis-a04de",
+    "storage_bucket": "pontis-a04de.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914437503685:android:c1d3970ae454d1c4084eac",
+        "android_client_info": {
+          "package_name": "com.example.pontis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "914437503685-g70eg3r8faq08s1jfg88j5lrv73qte4e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlRYRJGj5TWPcyoGiu5I3H8V4ntDNMh7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "914437503685-de0aoca4snmop706lpvr04r73656p35m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
